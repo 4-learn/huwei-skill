@@ -160,7 +160,10 @@ else if (cmd === 'exam') {
   const items = [];
   for (const l of labels()) for (const p of listImgs(join(EXAM, l))) items.push({ truth: l, path: p, angle: /-難/.test(p) ? 'hard' : 'front' });
   for (const p of listImgs(join(EXAM, '_非地標'))) items.push({ truth: '不認得', path: p, angle: 'neg' });
-  const pick = items.slice(0, limit);
+  // --limit：每類（各地標 + 非地標）輪流抽，避免只考到前幾個地標
+  const groups = {}; for (const it of items) (groups[it.truth] ||= []).push(it);
+  const pick = []; const gs = Object.values(groups);
+  for (let k = 0; pick.length < Math.min(limit, items.length); k++) for (const g of gs) if (g[k] && pick.length < limit) pick.push(g[k]);
   console.log(`📝 開始考試：${pick.length} 題（${plain ? '沒查相簿' : '查相簿'}）…`);
   const res = []; let i = 0;
   const worker = async () => { while (i < pick.length) { const it = pick[i++]; const r = await recognize(it.path, idx, { plain });
