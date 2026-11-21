@@ -1,0 +1,5 @@
+node_modules/
+huwei/data/.cache/
+huwei/data/out/
+huwei/data/.openai_key
+huwei/.openai_key
