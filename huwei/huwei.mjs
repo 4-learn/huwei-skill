@@ -123,8 +123,8 @@ if (cmd === 'ask') {
     if (r.candidates.length) console.log('   相簿最像：' + r.candidates.map(c => `${c.label}(${c.score})`).join('、'));
   }
   saveVec();
-  console.log('\n--- 給人看的圖（markdown）---');
-  for (const r of results) console.log(`![你的照片](${r.f}) ` + r.candidates.map(c => `![${c.label} ${c.score}](${c.path})`).join(' '));
+  const show = results.filter(r => r.answer !== '不認得' && r.candidates[0]).map((r, i) => `${r.candidates[0].path}\t相簿最像：${r.candidates[0].label}（${r.candidates[0].score}）`);
+  if (show.length) console.log('\n--- 用 present 給同學看（每行：路徑<TAB>說明）---\n' + show.join('\n'));
 }
 
 else if (cmd === 'add') {
@@ -188,7 +188,7 @@ else if (cmd === 'miss') {
   if (!res.length) { console.log('🎉 沒有答錯的'); process.exit(0); }
   for (const r of res) console.log(`❌ ${r.truth}（${r.angle === 'hard' ? '難角度' : r.angle === 'neg' ? '非地標' : '正面'}）→ BOT 答「${r.pred}」  ${r.path}`);
   console.log('\n💡 補救：去拍跟這張「同角度」的照片，加進正確地標的相簿');
-  console.log('\n' + res.slice(0, 8).map(r => `![正解 ${r.truth}，BOT 答 ${r.pred}](${r.path})`).join(' '));
+  console.log('\n--- 用 present 給老師看（最多 4 張）---\n' + res.slice(0, 4).map(r => `${r.path}\t正解 ${r.truth}，BOT 答 ${r.pred}`).join('\n'));
 }
 
 else if (cmd === 'index') { const idx = await albumIndex(); console.log(`✅ 相簿索引完成：${idx.length} 張`); }
