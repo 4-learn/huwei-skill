@@ -12,6 +12,8 @@ for d in exam calib; do mkdir -p "$DST/data/$d"; cp -rn "$SRC/data/$d/." "$DST/d
 if [ -d "$DST/data/album-full" ]; then cp -rn "$SRC/data/album/." "$DST/data/album-full/"; echo "（相簿瘦身中，只更新 album-full）"
 else mkdir -p "$DST/data/album"; cp -rn "$SRC/data/album/." "$DST/data/album/"; fi
 cp "$SRC/data/CREDITS.md" "$DST/data/"
+# 範例人設 skill（已存在就不覆蓋，避免蓋掉同學改過的版本）
+for ex in "$(dirname "$SRC")"/examples/*/; do n=$(basename "$ex"); [ -d "${DSH_HOME}/skills/$n" ] || cp -r "$ex" "${DSH_HOME}/skills/$n"; done
 cd "$DST" && npm install --silent --no-audit --no-fund
 echo "✅ 裝好了：$DST"
 node "$DST/huwei.mjs" album
