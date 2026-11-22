@@ -146,6 +146,14 @@ else if (cmd === 'add') {
   console.log(`\n✅ 加了 ${added} 張，「${label}」相簿現在 ${listImgs(join(ALBUM, label)).length} 張`);
 }
 
+else if (cmd === 'album' && args[0]) {
+  const l = args[0]; if (!labels().includes(l)) die(`「${l}」不在地標清單：${labels().join('、')}`);
+  const ps = listImgs(join(ALBUM, l)).sort();
+  console.log(`📚 「${l}」相簿現在 ${ps.length} 張（u- 開頭是同學加的）`);
+  console.log('\n--- 用 present 給同學看（每行：路徑<TAB>說明）---\n' + ps.slice(0, 12).map((p, i) => `${p}\t${l} 第 ${i + 1} 張${basename(p).startsWith('u-') ? '（同學加的）' : ''}`).join('\n'));
+  if (ps.length > 12) console.log(`（只列前 12 張，共 ${ps.length} 張）`);
+}
+
 else if (cmd === 'album') {
   console.log('📚 相簿：'); let tot = 0;
   for (const l of labels()) { const n = listImgs(join(ALBUM, l)).length, u = listImgs(join(ALBUM, l)).filter(p => basename(p).startsWith('u-')).length; tot += n;
@@ -222,7 +230,7 @@ else {
   node huwei.mjs ask <照片...>          這是哪裡？
   node huwei.mjs ask --plain <照片...>  不查相簿直接問 AI（對照組）
   node huwei.mjs add <地標> <照片...>   加進相簿
-  node huwei.mjs album                  相簿統計
+  node huwei.mjs album [地標]           相簿統計 / 看某個地標的照片
   node huwei.mjs exam [--plain] [--limit N]  考試
   node huwei.mjs miss [地標]            上次答錯的照片
   node huwei.mjs slim [N] / restore     （老師）相簿瘦身 / 還原
