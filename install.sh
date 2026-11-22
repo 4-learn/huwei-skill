@@ -7,7 +7,10 @@ mkdir -p "$DST"
 # 程式與說明書每次覆蓋；相簿裡同學加的照片（u-*）保留
 cp "$SRC/SKILL.md" "$SRC/huwei.mjs" "$SRC/package.json" "$DST/"
 mkdir -p "$DST/data"
-for d in album exam calib; do mkdir -p "$DST/data/$d"; cp -rn "$SRC/data/$d/." "$DST/data/$d/"; done
+for d in exam calib; do mkdir -p "$DST/data/$d"; cp -rn "$SRC/data/$d/." "$DST/data/$d/"; done
+# 相簿：瘦身中（有 album-full 備份）就只更新備份，不動上課用的相簿
+if [ -d "$DST/data/album-full" ]; then cp -rn "$SRC/data/album/." "$DST/data/album-full/"; echo "（相簿瘦身中，只更新 album-full）"
+else mkdir -p "$DST/data/album"; cp -rn "$SRC/data/album/." "$DST/data/album/"; fi
 cp "$SRC/data/CREDITS.md" "$DST/data/"
 cd "$DST" && npm install --silent --no-audit --no-fund
 echo "✅ 裝好了：$DST"
