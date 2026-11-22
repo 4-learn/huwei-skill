@@ -196,6 +196,27 @@ else if (cmd === 'miss') {
 
 else if (cmd === 'index') { const idx = await albumIndex(); console.log(`✅ 相簿索引完成：${idx.length} 張`); }
 
+// 老師用：上課前把相簿瘦身（每個地標只留 N 張），完整版備份到 data/album-full/
+else if (cmd === 'slim') {
+  const { renameSync, rmSync, cpSync } = await import('node:fs');
+  const n = +(args[0] || 3); const FULL = join(DATA, 'album-full');
+  if (!existsSync(FULL)) cpSync(ALBUM, FULL, { recursive: true });
+  for (const l of labels()) {
+    const keep = listImgs(join(FULL, l)).filter(p => !basename(p).startsWith('u-')).sort().slice(0, n).map(p => basename(p));
+    for (const p of listImgs(join(ALBUM, l))) if (!keep.includes(basename(p)) && !basename(p).startsWith('u-')) rmSync(p);
+  }
+  rmSync(join(OUT, 'history.json'), { force: true });
+  console.log(`✂️ 相簿瘦身：每個地標留 ${n} 張（同學加的 u-* 保留）；完整版在 data/album-full/`);
+}
+
+// 老師用：還原完整相簿（同學加的照片保留）
+else if (cmd === 'restore') {
+  const { cpSync } = await import('node:fs'); const FULL = join(DATA, 'album-full');
+  if (!existsSync(FULL)) die('沒有備份，不需要還原');
+  cpSync(FULL, ALBUM, { recursive: true, force: false, errorOnExist: false });
+  console.log('↩️ 已還原完整相簿（同學加的照片保留）');
+}
+
 else {
   console.log(`用法：
   node huwei.mjs ask <照片...>          這是哪裡？
@@ -204,5 +225,6 @@ else {
   node huwei.mjs album                  相簿統計
   node huwei.mjs exam [--plain] [--limit N]  考試
   node huwei.mjs miss [地標]            上次答錯的照片
+  node huwei.mjs slim [N] / restore     （老師）相簿瘦身 / 還原
 地標：${labels().join('、')}`);
 }
